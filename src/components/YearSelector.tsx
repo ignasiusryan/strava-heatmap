@@ -31,6 +31,12 @@ export function YearSelector({ years, mode, onSelect }: Props) {
   return (
     <div style={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
       <button
+        style={mode.type === "all" ? btnActive : btnBase}
+        onClick={() => onSelect({ type: "all" })}
+      >
+        All Years
+      </button>
+      <button
         style={mode.type === "rolling" ? btnActive : btnBase}
         onClick={() => onSelect({ type: "rolling" })}
       >

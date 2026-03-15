@@ -1,6 +1,7 @@
 export type HeatmapMode =
   | { type: "year"; year: number }
-  | { type: "rolling" };
+  | { type: "rolling" }
+  | { type: "all" };
 
 export interface HeatmapDay {
   date: string; // YYYY-MM-DD
@@ -28,13 +29,21 @@ function toDateStr(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function getLevel(km: number, maxKm: number): number {
+// Monday = 0, Tuesday = 1, ..., Sunday = 6
+function mondayIndex(d: Date): number {
+  return (d.getDay() + 6) % 7;
+}
+
+function getLevel(km: number, sortedVals: number[]): number {
   if (!km || km <= 0) return 0;
-  const ratio = km / maxKm;
-  if (ratio < 0.15) return 1;
-  if (ratio < 0.35) return 2;
-  if (ratio < 0.55) return 3;
-  if (ratio < 0.8) return 4;
+  if (sortedVals.length === 0) return 1;
+  // Percentile-based: rank this value among all non-zero values
+  const rank = sortedVals.filter((v) => v <= km).length;
+  const pct = rank / sortedVals.length;
+  if (pct <= 0.2) return 1;
+  if (pct <= 0.4) return 2;
+  if (pct <= 0.6) return 3;
+  if (pct <= 0.8) return 4;
   return 5;
 }
 
@@ -53,7 +62,7 @@ export function buildHeatmap(
     startDate = new Date(endDate);
     startDate.setDate(startDate.getDate() - 364);
     title = "Past year of running";
-  } else {
+  } else if (mode.type === "year") {
     const year = mode.year;
     const isCurrentYear = year === now.getFullYear();
     startDate = new Date(year, 0, 1);
@@ -61,9 +70,15 @@ export function buildHeatmap(
       ? new Date(now.getFullYear(), now.getMonth(), now.getDate())
       : new Date(year, 11, 31);
     title = `${year} running activity`;
+  } else {
+    // "all" mode — not used directly, StackedHeatmap calls per-year
+    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 364);
+    title = "All years of running";
   }
 
-  // Compute max for color scaling within range
+  // Collect all non-zero values in range for percentile-based coloring
   const vals: number[] = [];
   const cursor = new Date(startDate);
   while (cursor <= endDate) {
@@ -71,11 +86,11 @@ export function buildHeatmap(
     if (k && k > 0) vals.push(k);
     cursor.setDate(cursor.getDate() + 1);
   }
-  const maxKm = vals.length ? Math.max(...vals) : 10;
+  const sortedVals = vals.sort((a, b) => a - b);
 
-  // Pad start to Sunday
+  // Pad start to Monday
   const gridStart = new Date(startDate);
-  gridStart.setDate(gridStart.getDate() - gridStart.getDay());
+  gridStart.setDate(gridStart.getDate() - mondayIndex(gridStart));
 
   const weeks: HeatmapDay[][] = [];
   const months: { label: string; weekIndex: number }[] = [];
@@ -85,8 +100,8 @@ export function buildHeatmap(
     mode.type === "year" && mode.year === now.getFullYear();
   const isRolling = mode.type === "rolling";
 
-  while (current <= endDate || current.getDay() !== 0) {
-    if (current.getDay() === 0) weeks.push([]);
+  while (current <= endDate || mondayIndex(current) !== 0) {
+    if (mondayIndex(current) === 0) weeks.push([]);
 
     const dateStr = toDateStr(current);
     const inRange = current >= startDate && current <= endDate;
@@ -99,13 +114,13 @@ export function buildHeatmap(
     weeks[weeks.length - 1].push({
       date: dateStr,
       km,
-      level: inRange && !isFuture ? getLevel(km, maxKm) : -1,
+      level: inRange && !isFuture ? getLevel(km, sortedVals) : -1,
       isFuture: isFuture && inRange,
       inRange,
     });
 
-    // Month labels
-    if (inRange && current.getDay() === 0) {
+    // Month labels — place on Monday of each new month
+    if (inRange && mondayIndex(current) === 0) {
       const m = current.getMonth();
       if (m !== lastMonth) {
         months.push({ label: MONTH_NAMES[m], weekIndex: weeks.length - 1 });

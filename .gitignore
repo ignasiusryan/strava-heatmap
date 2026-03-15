@@ -28,6 +28,10 @@ yarn-error.log*
 # env files
 .env*.local
 
+# script outputs
+scripts/.strava_token.json
+route-animation.gif
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

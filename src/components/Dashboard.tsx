@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { buildHeatmap, type HeatmapMode } from "@/lib/heatmap";
 import { StatsRow } from "./StatsRow";
 import { Heatmap } from "./Heatmap";
+import { StackedHeatmap } from "./StackedHeatmap";
 import { RecentRuns } from "./RecentRuns";
 import { YearSelector } from "./YearSelector";
 import { ThemeToggle } from "./ThemeToggle";
 import { DownloadButton } from "./DownloadButton";
+import { DownloadStackedButton } from "./DownloadStackedButton";
+import { DownloadFacetsButton } from "./DownloadFacetsButton";
+import { StravaAttribution } from "./StravaAttribution";
+import { RouteFacets } from "./RouteFacets";
+
+type View = "heatmap" | "routes";
 
 export interface Activity {
   id: number;
@@ -17,6 +24,9 @@ export interface Activity {
   start_date_local: string;
   type: string;
   sport_type?: string;
+  map?: {
+    summary_polyline?: string;
+  };
 }
 
 interface Props {
@@ -28,7 +38,22 @@ export function Dashboard({ athleteName }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<HeatmapMode>({ type: "rolling" });
-  const dashRef = useRef<HTMLDivElement>(null);
+  const [view, setView] = useState<View>("heatmap");
+  const [excludedYears, setExcludedYears] = useState<Set<number>>(new Set());
+
+  const toggleExcludedYear = (y: number) => {
+    setExcludedYears((prev) => {
+      const next = new Set(prev);
+      if (next.has(y)) {
+        next.delete(y);
+      } else {
+        // Need at least the full sortedYears list to check count — use activities
+        // We'll check against sortedYears length in the render
+        next.add(y);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     async function load() {
@@ -138,26 +163,31 @@ export function Dashboard({ athleteName }: Props) {
   });
 
   // Filter activities for stats and recent runs
-  const filteredActivities = activities.filter((a) => {
-    const date = new Date(a.start_date_local);
-    if (mode.type === "rolling") {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 364);
-      return date >= cutoff;
-    }
-    return date.getFullYear() === mode.year;
-  });
+  const filteredActivities =
+    mode.type === "all"
+      ? activities
+      : activities.filter((a) => {
+          const date = new Date(a.start_date_local);
+          if (mode.type === "rolling") {
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - 364);
+            return date >= cutoff;
+          }
+          return date.getFullYear() === mode.year;
+        });
 
-  const heatmapData = buildHeatmap(dateMap, mode);
+  const heatmapData =
+    mode.type === "all" ? null : buildHeatmap(dateMap, mode);
 
   const downloadFilename =
-    mode.type === "rolling"
-      ? "strava-heatmap-past-year.png"
-      : `strava-heatmap-${mode.year}.png`;
+    mode.type === "all"
+      ? "strava-heatmap-all-years.png"
+      : mode.type === "rolling"
+        ? "strava-heatmap-past-year.png"
+        : `strava-heatmap-${mode.year}.png`;
 
   return (
     <div
-      ref={dashRef}
       style={{
         maxWidth: "1100px",
         margin: "0 auto",
@@ -211,7 +241,6 @@ export function Dashboard({ athleteName }: Props) {
         </div>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           <ThemeToggle />
-          <DownloadButton targetRef={dashRef} filename={downloadFilename} />
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"
@@ -237,37 +266,145 @@ export function Dashboard({ athleteName }: Props) {
       {/* Stats */}
       <StatsRow activities={filteredActivities} />
 
-      {/* Heatmap */}
+      {/* View toggle */}
       <div
         style={{
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "18px",
-          padding: "2rem",
-          marginBottom: "2rem",
-          animation: "slideUp 0.5s ease 0.25s both",
+          display: "flex",
+          gap: "0.25rem",
+          marginBottom: "1rem",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "1.5rem",
-            flexWrap: "wrap",
-            gap: "0.5rem",
-          }}
-        >
-          <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
-            {heatmapData.title}
-          </h2>
-          <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
-        </div>
-        <Heatmap data={heatmapData} />
+        {(["heatmap", "routes"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            style={{
+              padding: "0.4rem 1rem",
+              border: `1px solid ${view === v ? "var(--orange-5)" : "var(--border)"}`,
+              borderRadius: "8px",
+              background: view === v ? "var(--orange-5)" : "transparent",
+              color: view === v ? "#000" : "var(--text-muted)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.15s",
+              textTransform: "capitalize",
+            }}
+          >
+            {v === "heatmap" ? "Heatmap" : "Routes"}
+          </button>
+        ))}
       </div>
 
-      {/* Recent Runs */}
-      <RecentRuns activities={filteredActivities} />
+      {view === "heatmap" ? (
+        <>
+          {/* Heatmap */}
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: "18px",
+              padding: "2rem",
+              marginBottom: "2rem",
+              animation: "slideUp 0.5s ease 0.25s both",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "1.5rem",
+                flexWrap: "wrap",
+                gap: "0.5rem",
+              }}
+            >
+              <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+                {mode.type === "all"
+                  ? "All years of running"
+                  : heatmapData!.title}
+              </h2>
+              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
+                {heatmapData ? (
+                  <DownloadButton
+                    heatmapData={heatmapData}
+                    activities={filteredActivities}
+                    athleteName={athleteName}
+                    filename={downloadFilename}
+                  />
+                ) : (
+                  <DownloadStackedButton
+                    years={sortedYears.filter((y) => !excludedYears.has(y))}
+                    dateMap={dateMap}
+                    athleteName={athleteName}
+                  />
+                )}
+              </div>
+            </div>
+            {mode.type === "all" ? (
+              <StackedHeatmap
+                    years={sortedYears}
+                    dateMap={dateMap}
+                    excluded={excludedYears}
+                    onToggleYear={(y) => {
+                      // Don't allow excluding all years
+                      const visibleCount = sortedYears.filter((yr) => !excludedYears.has(yr)).length;
+                      if (!excludedYears.has(y) && visibleCount <= 1) return;
+                      toggleExcludedYear(y);
+                    }}
+                  />
+            ) : (
+              <Heatmap data={heatmapData!} />
+            )}
+          </div>
+
+          {/* Recent Runs */}
+          <RecentRuns activities={filteredActivities} />
+        </>
+      ) : (
+        /* Route Facets */
+        <div
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "18px",
+            padding: "2rem",
+            marginBottom: "2rem",
+            animation: "slideUp 0.5s ease 0.25s both",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "1rem",
+            }}
+          >
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+              Route Facets
+            </h2>
+            <DownloadFacetsButton
+              activities={activities}
+              athleteName={athleteName}
+            />
+          </div>
+          <RouteFacets activities={activities} />
+        </div>
+      )}
+
+      {/* Attribution */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "2rem",
+        }}
+      >
+        <StravaAttribution />
+      </div>
     </div>
   );
 }

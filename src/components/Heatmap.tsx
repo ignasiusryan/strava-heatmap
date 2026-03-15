@@ -7,7 +7,7 @@ interface Props {
   data: HeatmapData;
 }
 
-const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function Heatmap({ data }: Props) {
   const cellSize = 13;

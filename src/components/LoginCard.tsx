@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeToggle } from "./ThemeToggle";
+import { StravaAttribution } from "./StravaAttribution";
 
 export function LoginCard() {
   return (
@@ -119,6 +120,18 @@ export function LoginCard() {
         >
           Your credentials stay safe — OAuth happens entirely server-side.
         </p>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "1.5rem",
+            paddingTop: "1.5rem",
+            borderTop: "1px solid var(--border)",
+          }}
+        >
+          <StravaAttribution />
+        </div>
       </div>
     </div>
   );
