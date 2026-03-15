@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
   });
 
   if (!tokenRes.ok) {
-    return NextResponse.redirect(`${origin}/?error=token_exchange_failed`);
+    const errBody = await tokenRes.text();
+    return NextResponse.redirect(
+      `${origin}/?error=token_exchange_failed&detail=${encodeURIComponent(errBody)}`
+    );
   }
 
   const data = await tokenRes.json();
