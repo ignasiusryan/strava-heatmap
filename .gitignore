@@ -35,3 +35,4 @@ route-animation.gif
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.vercel
