@@ -39,10 +39,18 @@ export async function GET(request: NextRequest) {
     athlete_name: `${data.athlete.firstname || ""} ${data.athlete.lastname || ""}`.trim(),
   };
 
-  const response = NextResponse.redirect(origin);
-  response.cookies.set(COOKIE_NAME, encrypt(JSON.stringify(session)), {
+  const encrypted = encrypt(JSON.stringify(session));
+
+  // Use HTML redirect so the Set-Cookie header is properly processed
+  const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body>Redirecting...</body></html>`;
+  const response = new NextResponse(html, {
+    status: 200,
+    headers: { "Content-Type": "text/html" },
+  });
+
+  response.cookies.set(COOKIE_NAME, encrypted, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
