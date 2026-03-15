@@ -14,8 +14,9 @@ export async function GET(request: NextRequest) {
     xForwardedProto,
     cookies,
     env: {
-      hasClientId: !!process.env.STRAVA_CLIENT_ID,
-      hasClientSecret: !!process.env.STRAVA_CLIENT_SECRET,
+      clientId: process.env.STRAVA_CLIENT_ID,
+      secretPrefix: process.env.STRAVA_CLIENT_SECRET?.slice(0, 6) + "...",
+      secretLength: process.env.STRAVA_CLIENT_SECRET?.length,
       hasCookieSecret: !!process.env.COOKIE_SECRET,
       nodeEnv: process.env.NODE_ENV,
     },
