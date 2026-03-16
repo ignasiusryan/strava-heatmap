@@ -320,6 +320,7 @@ export function Dashboard({ athleteName }: Props) {
               borderRadius: "18px",
               padding: "2rem",
               marginBottom: "2rem",
+              overflow: "hidden",
               animation: "slideUp 0.5s ease 0.25s both",
             }}
           >
@@ -387,6 +388,7 @@ export function Dashboard({ athleteName }: Props) {
             borderRadius: "18px",
             padding: "2rem",
             marginBottom: "2rem",
+            overflow: "hidden",
             animation: "slideUp 0.5s ease 0.25s both",
           }}
         >
@@ -419,6 +421,7 @@ export function Dashboard({ athleteName }: Props) {
             borderRadius: "18px",
             padding: "2rem",
             marginBottom: "2rem",
+            overflow: "hidden",
             animation: "slideUp 0.5s ease 0.25s both",
           }}
         >
@@ -455,6 +458,7 @@ export function Dashboard({ athleteName }: Props) {
             borderRadius: "18px",
             padding: "2rem",
             marginBottom: "2rem",
+            overflow: "hidden",
             animation: "slideUp 0.5s ease 0.25s both",
           }}
         >
