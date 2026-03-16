@@ -29,7 +29,7 @@ const btnActive: React.CSSProperties = {
 
 export function YearSelector({ years, mode, onSelect }: Props) {
   return (
-    <div style={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
+    <div className="year-selector" style={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
       <button
         style={mode.type === "all" ? btnActive : btnBase}
         onClick={() => onSelect({ type: "all" })}

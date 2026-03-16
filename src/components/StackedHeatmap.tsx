@@ -106,7 +106,7 @@ export function StackedHeatmap({ years, dateMap, excluded, onToggleYear }: Props
             ))}
           </div>
 
-          <div style={{ overflowX: "auto", paddingBottom: "0.25rem" }}>
+          <div className="heatmap-scroll" style={{ overflowX: "auto", paddingBottom: "0.25rem" }}>
             <div
               style={{
                 display: "inline-flex",

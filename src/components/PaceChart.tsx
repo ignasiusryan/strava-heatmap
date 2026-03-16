@@ -357,6 +357,7 @@ export function PaceChart({
     <div>
       {/* Controls row */}
       <div
+        className="filter-row"
         style={{
           display: "flex",
           alignItems: "center",
@@ -368,6 +369,7 @@ export function PaceChart({
       >
         {/* Distance filter */}
         <div
+          className="filter-chips"
           style={{
             display: "flex",
             alignItems: "center",

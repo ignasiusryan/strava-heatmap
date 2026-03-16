@@ -132,6 +132,7 @@ export function RouteFacets({ activities }: Props) {
         </div>
       </div>
       <div
+        className="route-facets-grid"
         style={{
           display: "flex",
           flexWrap: "wrap",

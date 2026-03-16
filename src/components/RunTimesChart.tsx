@@ -294,6 +294,7 @@ export function RunTimesChart({ activities }: Props) {
     <div>
       {/* Controls */}
       <div
+        className="filter-row"
         style={{
           display: "flex",
           alignItems: "center",
@@ -544,6 +545,7 @@ export function RunTimesChart({ activities }: Props) {
 
       {/* Summary stats */}
       <div
+        className="time-summary-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",

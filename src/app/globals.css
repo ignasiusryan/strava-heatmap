@@ -78,3 +78,142 @@ body::before {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ── Mobile responsive ── */
+@media (max-width: 640px) {
+  body { -webkit-text-size-adjust: 100%; }
+
+  .dashboard-container {
+    padding: 1.25rem 1rem 2rem !important;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .stats-grid > div {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .stats-grid .stat-value {
+    font-size: 1.2rem !important;
+  }
+
+  .view-toggle {
+    gap: 0.2rem !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+  }
+
+  .view-toggle::-webkit-scrollbar {
+    display: none;
+  }
+
+  .view-toggle button {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .card-section {
+    padding: 1.25rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .card-section h2 {
+    font-size: 0.95rem !important;
+  }
+
+  .card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .year-selector {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+    flex-wrap: nowrap !important;
+    width: 100%;
+  }
+
+  .year-selector::-webkit-scrollbar {
+    display: none;
+  }
+
+  .year-selector button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .filter-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+
+  .filter-chips {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+    width: 100%;
+  }
+
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .heatmap-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .recent-runs-card {
+    padding: 1.25rem !important;
+  }
+
+  .run-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+  }
+
+  .run-stats {
+    gap: 0.75rem !important;
+    width: 100%;
+  }
+
+  .login-card {
+    padding: 1.75rem !important;
+  }
+
+  .login-card h1 {
+    font-size: 1.35rem !important;
+  }
+
+  .time-summary-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .time-summary-grid > div {
+    padding: 0.5rem 0.4rem !important;
+  }
+
+  .route-facets-grid {
+    gap: 1px !important;
+  }
+}

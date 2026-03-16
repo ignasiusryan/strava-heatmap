@@ -42,7 +42,7 @@ export function Heatmap({ data }: Props) {
         ))}
       </div>
 
-      <div style={{ overflowX: "auto", paddingBottom: "0.5rem" }}>
+      <div className="heatmap-scroll" style={{ overflowX: "auto", paddingBottom: "0.5rem" }}>
         <div style={{ display: "inline-flex", gap: 0, alignItems: "flex-start" }}>
           {/* Day labels */}
           <div

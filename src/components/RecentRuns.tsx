@@ -18,6 +18,7 @@ export function RecentRuns({ activities }: Props) {
 
   return (
     <div
+      className="recent-runs-card"
       style={{
         background: "var(--surface)",
         border: "1px solid var(--border)",
@@ -51,6 +52,7 @@ export function RecentRuns({ activities }: Props) {
           return (
             <div
               key={r.id}
+              className="run-row"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -90,7 +92,7 @@ export function RecentRuns({ activities }: Props) {
                   {dateStr}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "1.5rem", flexShrink: 0 }}>
+              <div className="run-stats" style={{ display: "flex", gap: "1.5rem", flexShrink: 0 }}>
                 <div>
                   <div
                     style={{

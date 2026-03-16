@@ -190,6 +190,7 @@ export function Dashboard({ athleteName }: Props) {
 
   return (
     <div
+      className="dashboard-container"
       style={{
         maxWidth: "1100px",
         margin: "0 auto",
@@ -199,6 +200,7 @@ export function Dashboard({ athleteName }: Props) {
     >
       {/* Header */}
       <div
+        className="dashboard-header"
         style={{
           display: "flex",
           alignItems: "flex-end",
@@ -270,6 +272,7 @@ export function Dashboard({ athleteName }: Props) {
 
       {/* View toggle */}
       <div
+        className="view-toggle"
         style={{
           display: "flex",
           gap: "0.25rem",
@@ -310,6 +313,7 @@ export function Dashboard({ athleteName }: Props) {
         <>
           {/* Heatmap */}
           <div
+            className="card-section"
             style={{
               background: "var(--surface)",
               border: "1px solid var(--border)",
@@ -320,6 +324,7 @@ export function Dashboard({ athleteName }: Props) {
             }}
           >
             <div
+              className="card-header"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -375,6 +380,7 @@ export function Dashboard({ athleteName }: Props) {
 
       {view === "routes" && (
         <div
+          className="card-section"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--border)",
@@ -406,6 +412,7 @@ export function Dashboard({ athleteName }: Props) {
 
       {view === "insights" && (
         <div
+          className="card-section"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--border)",
@@ -416,6 +423,7 @@ export function Dashboard({ athleteName }: Props) {
           }}
         >
           <div
+            className="card-header"
             style={{
               display: "flex",
               alignItems: "center",
@@ -440,6 +448,7 @@ export function Dashboard({ athleteName }: Props) {
 
       {view === "times" && (
         <div
+          className="card-section"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--border)",
@@ -450,6 +459,7 @@ export function Dashboard({ athleteName }: Props) {
           }}
         >
           <div
+            className="card-header"
             style={{
               display: "flex",
               alignItems: "center",

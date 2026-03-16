@@ -27,6 +27,7 @@ export function StatsRow({ activities }: Props) {
 
   return (
     <div
+      className="stats-grid"
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -61,6 +62,7 @@ export function StatsRow({ activities }: Props) {
             {s.label}
           </div>
           <div
+            className="stat-value"
             style={{
               fontSize: "1.6rem",
               fontWeight: 800,
