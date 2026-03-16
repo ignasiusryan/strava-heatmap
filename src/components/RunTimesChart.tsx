@@ -21,17 +21,25 @@ function hourLabelShort(h: number): string {
   return h.toString().padStart(2, "0");
 }
 
+// Extract hour directly from the ISO string to avoid timezone conversion.
+// Strava's start_date_local is already in the activity's local time but
+// has a Z suffix, so new Date() would misinterpret it as UTC.
+function getLocalHour(dateStr: string): number {
+  // Format: "2024-01-15T06:30:00Z" — hour is at index 11-12
+  return parseInt(dateStr.slice(11, 13), 10);
+}
+
 function getHourCounts(activities: Activity[]): number[] {
   const counts = new Array(24).fill(0);
   for (const a of activities) {
-    const hour = new Date(a.start_date_local).getHours();
-    counts[hour]++;
+    counts[getLocalHour(a.start_date_local)]++;
   }
   return counts;
 }
 
 function isWeekend(dateStr: string): boolean {
-  const day = new Date(dateStr).getDay();
+  // Parse date portion only to avoid timezone shift
+  const day = new Date(dateStr.slice(0, 10) + "T12:00:00").getDay();
   return day === 0 || day === 6;
 }
 
