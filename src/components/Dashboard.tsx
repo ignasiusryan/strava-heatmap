@@ -428,7 +428,11 @@ export function Dashboard({ athleteName }: Props) {
             </h2>
             <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
           </div>
-          <PaceChart activities={filteredActivities} />
+          <PaceChart
+            activities={filteredActivities}
+            allActivities={activities}
+            showYearComparison={mode.type === "all"}
+          />
         </div>
       )}
 
