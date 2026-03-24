@@ -53,8 +53,6 @@ export function Dashboard({ athleteName }: Props) {
       if (next.has(y)) {
         next.delete(y);
       } else {
-        // Need at least the full sortedYears list to check count — use activities
-        // We'll check against sortedYears length in the render
         next.add(y);
       }
       return next;
@@ -168,7 +166,7 @@ export function Dashboard({ athleteName }: Props) {
     dateMap[d] = (dateMap[d] || 0) + a.distance / 1000;
   });
 
-  // Filter activities for stats and recent runs
+  // Filter activities based on global filter
   const filteredActivities =
     mode.type === "all"
       ? activities
@@ -192,6 +190,14 @@ export function Dashboard({ athleteName }: Props) {
         ? "lariviz-heatmap-past-year.png"
         : `lariviz-heatmap-${mode.year}.png`;
 
+  // Label for the current filter scope
+  const filterLabel =
+    mode.type === "all"
+      ? "All years"
+      : mode.type === "rolling"
+        ? "Past year"
+        : String(mode.year);
+
   return (
     <div
       className="dashboard-container"
@@ -209,7 +215,7 @@ export function Dashboard({ athleteName }: Props) {
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "space-between",
-          marginBottom: "2.5rem",
+          marginBottom: "1.5rem",
           flexWrap: "wrap",
           gap: "1rem",
         }}
@@ -271,6 +277,20 @@ export function Dashboard({ athleteName }: Props) {
         </div>
       </div>
 
+      {/* Global year filter */}
+      <div
+        className="year-selector"
+        style={{
+          display: "flex",
+          gap: "0.25rem",
+          flexWrap: "wrap",
+          marginBottom: "1.5rem",
+          alignItems: "center",
+        }}
+      >
+        <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
+      </div>
+
       {/* Stats */}
       <StatsRow activities={filteredActivities} />
 
@@ -313,74 +333,68 @@ export function Dashboard({ athleteName }: Props) {
         })}
       </div>
 
+      {/* Tab content */}
       {view === "heatmap" && (
-        <>
-          {/* Heatmap */}
+        <div
+          className="card-section"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "18px",
+            padding: "2rem",
+            marginBottom: "2rem",
+            overflow: "hidden",
+            animation: "slideUp 0.5s ease 0.25s both",
+          }}
+        >
           <div
-            className="card-section"
+            className="card-header"
             style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderRadius: "18px",
-              padding: "2rem",
-              marginBottom: "2rem",
-              overflow: "hidden",
-              animation: "slideUp 0.5s ease 0.25s both",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "1.5rem",
+              flexWrap: "wrap",
+              gap: "0.5rem",
             }}
           >
-            <div
-              className="card-header"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "1.5rem",
-                flexWrap: "wrap",
-                gap: "0.5rem",
-              }}
-            >
-              <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
-                {mode.type === "all"
-                  ? "All years of running"
-                  : heatmapData!.title}
-              </h2>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
-                {heatmapData ? (
-                  <DownloadButton
-                    heatmapData={heatmapData}
-                    activities={filteredActivities}
-                    athleteName={athleteName}
-                    filename={downloadFilename}
-                  />
-                ) : (
-                  <DownloadStackedButton
-                    years={sortedYears.filter((y) => !excludedYears.has(y))}
-                    dateMap={dateMap}
-                    athleteName={athleteName}
-                  />
-                )}
-              </div>
-            </div>
-            {mode.type === "all" ? (
-              <StackedHeatmap
-                    years={sortedYears}
-                    dateMap={dateMap}
-                    excluded={excludedYears}
-                    onToggleYear={(y) => {
-                      const visibleCount = sortedYears.filter((yr) => !excludedYears.has(yr)).length;
-                      if (!excludedYears.has(y) && visibleCount <= 1) return;
-                      toggleExcludedYear(y);
-                    }}
-                  />
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+              {mode.type === "all"
+                ? "All years of running"
+                : heatmapData!.title}
+            </h2>
+            {heatmapData ? (
+              <DownloadButton
+                heatmapData={heatmapData}
+                activities={filteredActivities}
+                athleteName={athleteName}
+                filename={downloadFilename}
+              />
             ) : (
-              <Heatmap data={heatmapData!} />
+              <DownloadStackedButton
+                years={sortedYears.filter((y) => !excludedYears.has(y))}
+                dateMap={dateMap}
+                athleteName={athleteName}
+              />
             )}
           </div>
-
-          {/* Recent Runs */}
-          <RecentRuns activities={filteredActivities} />
-        </>
+          {mode.type === "all" ? (
+            <StackedHeatmap
+              years={sortedYears}
+              dateMap={dateMap}
+              excluded={excludedYears}
+              onToggleYear={(y) => {
+                const visibleCount = sortedYears.filter(
+                  (yr) => !excludedYears.has(yr)
+                ).length;
+                if (!excludedYears.has(y) && visibleCount <= 1) return;
+                toggleExcludedYear(y);
+              }}
+            />
+          ) : (
+            <Heatmap data={heatmapData!} />
+          )}
+        </div>
       )}
 
       {view === "routes" && (
@@ -408,11 +422,11 @@ export function Dashboard({ athleteName }: Props) {
               Route Facets
             </h2>
             <DownloadFacetsButton
-              activities={activities}
+              activities={filteredActivities}
               athleteName={athleteName}
             />
           </div>
-          <RouteFacets activities={activities} />
+          <RouteFacets activities={filteredActivities} />
         </div>
       )}
 
@@ -436,14 +450,11 @@ export function Dashboard({ athleteName }: Props) {
               alignItems: "center",
               justifyContent: "space-between",
               marginBottom: "1.5rem",
-              flexWrap: "wrap",
-              gap: "0.5rem",
             }}
           >
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
               Pace vs Distance
             </h2>
-            <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
           </div>
           <PaceChart
             activities={filteredActivities}
@@ -473,18 +484,18 @@ export function Dashboard({ athleteName }: Props) {
               alignItems: "center",
               justifyContent: "space-between",
               marginBottom: "1.5rem",
-              flexWrap: "wrap",
-              gap: "0.5rem",
             }}
           >
             <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
               Run Times
             </h2>
-            <YearSelector years={sortedYears} mode={mode} onSelect={setMode} />
           </div>
           <RunTimesChart activities={filteredActivities} />
         </div>
       )}
+
+      {/* Recent Runs — always visible */}
+      <RecentRuns activities={filteredActivities} />
 
       {/* Attribution */}
       <div
