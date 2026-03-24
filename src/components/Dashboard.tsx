@@ -29,6 +29,10 @@ export interface Activity {
   map?: {
     summary_polyline?: string;
   };
+  location_city?: string | null;
+  location_state?: string | null;
+  location_country?: string | null;
+  timezone?: string;
 }
 
 interface Props {

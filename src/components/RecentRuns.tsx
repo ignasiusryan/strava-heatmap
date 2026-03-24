@@ -1,10 +1,78 @@
 "use client";
 
+import { useMemo } from "react";
 import { formatDuration, formatPace, formatNumber } from "@/lib/format";
+import { decodePolyline, normalizePoints } from "@/lib/polyline";
 import type { Activity } from "./Dashboard";
 
 interface Props {
   activities: Activity[];
+}
+
+const THUMB_SIZE = 36;
+
+function RouteThumb({ activity }: { activity: Activity }) {
+  const polyline = activity.map?.summary_polyline;
+
+  const path = useMemo(() => {
+    if (!polyline) return null;
+    const decoded = decodePolyline(polyline);
+    if (decoded.length < 2) return null;
+    const pts = normalizePoints(decoded, THUMB_SIZE);
+    return (
+      "M " +
+      pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L ")
+    );
+  }, [polyline]);
+
+  if (!path) {
+    return (
+      <div
+        style={{
+          width: THUMB_SIZE,
+          height: THUMB_SIZE,
+          borderRadius: 8,
+          background: "var(--surface-2)",
+          flexShrink: 0,
+        }}
+      />
+    );
+  }
+
+  return (
+    <svg
+      width={THUMB_SIZE}
+      height={THUMB_SIZE}
+      viewBox={`0 0 ${THUMB_SIZE} ${THUMB_SIZE}`}
+      style={{
+        display: "block",
+        flexShrink: 0,
+        borderRadius: 8,
+        background: "var(--surface-2)",
+      }}
+    >
+      <path
+        d={path}
+        fill="none"
+        stroke="var(--orange-5)"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function getLocation(activity: Activity): string | null {
+  // Try city first, then state, then extract from timezone
+  if (activity.location_city) return activity.location_city;
+  if (activity.location_state) return activity.location_state;
+  if (activity.timezone) {
+    // Timezone format: "(GMT+07:00) Asia/Jakarta" or "Asia/Jakarta"
+    const match = activity.timezone.match(/\/([^)]+)$/);
+    if (match) return match[1].replace(/_/g, " ");
+  }
+  return null;
 }
 
 export function RecentRuns({ activities }: Props) {
@@ -48,6 +116,7 @@ export function RecentRuns({ activities }: Props) {
               ? formatPace(r.moving_time / 60 / (r.distance / 1000))
               : "—";
           const dur = formatDuration(r.moving_time);
+          const location = getLocation(r);
 
           return (
             <div
@@ -56,20 +125,15 @@ export function RecentRuns({ activities }: Props) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "1rem",
+                gap: "0.75rem",
                 padding: "0.85rem 0",
                 borderBottom: "1px solid var(--border)",
               }}
             >
-              <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: "var(--orange-5)",
-                  flexShrink: 0,
-                }}
-              />
+              {/* Route thumbnail */}
+              <RouteThumb activity={r} />
+
+              {/* Name, date, location */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
@@ -87,12 +151,39 @@ export function RecentRuns({ activities }: Props) {
                     fontSize: "0.72rem",
                     color: "var(--text-muted)",
                     fontFamily: "var(--font-mono)",
+                    display: "flex",
+                    gap: "0.5rem",
+                    alignItems: "center",
                   }}
                 >
-                  {dateStr}
+                  <span>{dateStr}</span>
+                  {location && (
+                    <>
+                      <span style={{ color: "var(--text-dim)" }}>·</span>
+                      <span
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {location}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
-              <div className="run-stats" style={{ display: "flex", gap: "1.5rem", flexShrink: 0 }}>
+
+              {/* Stats - fixed width columns */}
+              <div
+                className="run-stats"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(60px, auto) minmax(48px, auto) minmax(56px, auto)",
+                  gap: "1rem",
+                  flexShrink: 0,
+                }}
+              >
                 <div>
                   <div
                     style={{
@@ -100,12 +191,12 @@ export function RecentRuns({ activities }: Props) {
                       fontSize: "0.82rem",
                       fontWeight: 600,
                       textAlign: "right",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {km}
                     <span style={{ color: "var(--text-dim)", fontWeight: 400 }}>
-                      {" "}
-                      km
+                      {" "}km
                     </span>
                   </div>
                   <div
@@ -128,6 +219,7 @@ export function RecentRuns({ activities }: Props) {
                       fontSize: "0.82rem",
                       fontWeight: 600,
                       textAlign: "right",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {pace}
@@ -152,6 +244,7 @@ export function RecentRuns({ activities }: Props) {
                       fontSize: "0.82rem",
                       fontWeight: 600,
                       textAlign: "right",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {dur}
