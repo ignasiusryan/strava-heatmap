@@ -106,41 +106,40 @@ export function PosterTab({ activities }: Props) {
       const textZoneTop = mapZoneTop + mapZoneHeight + 30;
       const cx = POSTER_W / 2;
 
-      // Activity name — large spaced letters
+      // Activity name — Inter font, large spaced letters
       const name = selectedActivity.name.toUpperCase();
-      ctx.font = "600 52px 'JetBrains Mono', Menlo, monospace";
+      ctx.font = "700 52px Inter, sans-serif";
       ctx.fillStyle = p.text;
-      ctx.letterSpacing = "8px";
+      ctx.letterSpacing = "10px";
       const nameW = ctx.measureText(name).width;
-      // Scale down if too wide
       if (nameW > POSTER_W - 120) {
         const scale = (POSTER_W - 120) / nameW;
-        ctx.font = `600 ${Math.floor(52 * scale)}px 'JetBrains Mono', Menlo, monospace`;
+        ctx.font = `700 ${Math.floor(52 * scale)}px Inter, sans-serif`;
       }
       const finalNameW = ctx.measureText(name).width;
-      ctx.fillText(name, cx - finalNameW / 2, textZoneTop + 40);
+      ctx.fillText(name, cx - finalNameW / 2, textZoneTop + 44);
       ctx.letterSpacing = "0px";
 
       // Accent line under name
       ctx.strokeStyle = p.accent;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(cx - 50, textZoneTop + 60);
-      ctx.lineTo(cx + 50, textZoneTop + 60);
+      ctx.moveTo(cx - 50, textZoneTop + 64);
+      ctx.lineTo(cx + 50, textZoneTop + 64);
       ctx.stroke();
 
       // Location
       const location = getLocation(selectedActivity);
       if (location) {
-        ctx.font = "400 26px 'JetBrains Mono', Menlo, monospace";
+        ctx.font = "400 24px Inter, sans-serif";
         ctx.fillStyle = p.textMuted;
-        ctx.letterSpacing = "4px";
+        ctx.letterSpacing = "5px";
         const locW = ctx.measureText(location.toUpperCase()).width;
-        ctx.fillText(location.toUpperCase(), cx - locW / 2, textZoneTop + 100);
+        ctx.fillText(location.toUpperCase(), cx - locW / 2, textZoneTop + 104);
         ctx.letterSpacing = "0px";
       }
 
-      // Stats row
+      // Stats row — bigger
       const distKm = selectedActivity.distance / 1000;
       const paceMin = distKm > 0 ? selectedActivity.moving_time / 60 / distKm : 0;
       const stats = [
@@ -149,21 +148,21 @@ export function PosterTab({ activities }: Props) {
         { label: "PACE", value: paceMin > 0 ? `${formatPace(paceMin)} /km` : "—" },
       ];
 
-      const statsY = textZoneTop + 160;
+      const statsY = textZoneTop + 174;
       const statColW = (POSTER_W - 120) / stats.length;
       for (let i = 0; i < stats.length; i++) {
         const sx = 60 + statColW * i + statColW / 2;
 
-        ctx.font = "600 34px Outfit, sans-serif";
+        ctx.font = "600 42px Inter, sans-serif";
         ctx.fillStyle = p.text;
         const vw = ctx.measureText(stats[i].value).width;
         ctx.fillText(stats[i].value, sx - vw / 2, statsY);
 
         ctx.font = "400 14px 'JetBrains Mono', Menlo, monospace";
         ctx.fillStyle = p.textMuted;
-        ctx.letterSpacing = "2px";
+        ctx.letterSpacing = "3px";
         const lw = ctx.measureText(stats[i].label).width;
-        ctx.fillText(stats[i].label, sx - lw / 2, statsY + 24);
+        ctx.fillText(stats[i].label, sx - lw / 2, statsY + 28);
         ctx.letterSpacing = "0px";
       }
 
@@ -310,18 +309,18 @@ export function PosterTab({ activities }: Props) {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 12,
+                    gap: 14,
                     padding: "0 60px",
                   }}
                 >
-                  {/* Activity name */}
+                  {/* Activity name — Inter font */}
                   <div
                     style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 46,
-                      fontWeight: 600,
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 52,
+                      fontWeight: 700,
                       color: palette.text,
-                      letterSpacing: "8px",
+                      letterSpacing: "10px",
                       textTransform: "uppercase",
                       textAlign: "center",
                       lineHeight: 1.2,
@@ -341,10 +340,11 @@ export function PosterTab({ activities }: Props) {
                   {getLocation(selectedActivity) && (
                     <div
                       style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 22,
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 24,
+                        fontWeight: 400,
                         color: palette.textMuted,
-                        letterSpacing: "4px",
+                        letterSpacing: "5px",
                         textTransform: "uppercase",
                       }}
                     >
@@ -352,8 +352,8 @@ export function PosterTab({ activities }: Props) {
                     </div>
                   )}
 
-                  {/* Stats row */}
-                  <div style={{ display: "flex", gap: 60, marginTop: 16 }}>
+                  {/* Stats row — bigger */}
+                  <div style={{ display: "flex", gap: 70, marginTop: 20 }}>
                     {(() => {
                       const distKm = selectedActivity.distance / 1000;
                       const paceMin = distKm > 0 ? selectedActivity.moving_time / 60 / distKm : 0;
@@ -363,10 +363,10 @@ export function PosterTab({ activities }: Props) {
                         { label: "PACE", value: paceMin > 0 ? `${formatPace(paceMin)} /km` : "—" },
                       ].map((stat) => (
                         <div key={stat.label} style={{ textAlign: "center" }}>
-                          <div style={{ fontFamily: "Outfit, sans-serif", fontSize: 30, fontWeight: 600, color: palette.text }}>
+                          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 42, fontWeight: 600, color: palette.text }}>
                             {stat.value}
                           </div>
-                          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: palette.textMuted, letterSpacing: "2px", marginTop: 4 }}>
+                          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, color: palette.textMuted, letterSpacing: "3px", marginTop: 6 }}>
                             {stat.label}
                           </div>
                         </div>

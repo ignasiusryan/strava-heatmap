@@ -22,6 +22,9 @@ export function PosterMap({ polyline, palette, width, height, onMapReady }: Prop
   const updateStyle = useCallback(
     (map: maplibregl.Map) => {
       // Update route layer colors
+      if (map.getLayer("route-glow-outer")) {
+        map.setPaintProperty("route-glow-outer", "line-color", palette.routeGlow);
+      }
       if (map.getLayer("route-glow")) {
         map.setPaintProperty("route-glow", "line-color", palette.routeGlow);
       }
@@ -83,27 +86,40 @@ export function PosterMap({ polyline, palette, width, height, onMapReady }: Prop
       // Add route source
       map.addSource("route", { type: "geojson", data: geojson });
 
-      // Route glow (wider, transparent)
+      // Route glow — outer (wide, soft)
+      map.addLayer({
+        id: "route-glow-outer",
+        type: "line",
+        source: "route",
+        paint: {
+          "line-color": palette.routeGlow,
+          "line-width": 18,
+          "line-blur": 14,
+        },
+        layout: { "line-cap": "round", "line-join": "round" },
+      });
+
+      // Route glow — inner (tighter)
       map.addLayer({
         id: "route-glow",
         type: "line",
         source: "route",
         paint: {
           "line-color": palette.routeGlow,
-          "line-width": 10,
-          "line-blur": 8,
+          "line-width": 8,
+          "line-blur": 4,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       });
 
-      // Route line (sharp)
+      // Route line (sharp, prominent)
       map.addLayer({
         id: "route-line",
         type: "line",
         source: "route",
         paint: {
           "line-color": palette.routeColor,
-          "line-width": 3,
+          "line-width": 3.5,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       });
