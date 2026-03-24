@@ -17,8 +17,14 @@ import { PaceChart } from "./PaceChart";
 import { RunTimesChart } from "./RunTimesChart";
 import { PersonalRecords } from "./PersonalRecords";
 import { StickerTab } from "./StickerTab";
+import dynamic from "next/dynamic";
 
-type View = "heatmap" | "routes" | "insights" | "times" | "records" | "stickers";
+const PosterTab = dynamic(() => import("./PosterTab").then((m) => ({ default: m.PosterTab })), {
+  ssr: false,
+  loading: () => <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-muted)" }}>Loading poster...</div>,
+});
+
+type View = "heatmap" | "routes" | "insights" | "times" | "records" | "stickers" | "poster";
 
 export interface Activity {
   id: number;
@@ -305,7 +311,7 @@ export function Dashboard({ athleteName }: Props) {
           marginBottom: "1rem",
         }}
       >
-        {(["heatmap", "routes", "insights", "times", "records", "stickers"] as const).map((v) => {
+        {(["heatmap", "routes", "insights", "times", "records", "stickers", "poster"] as const).map((v) => {
           const labels: Record<View, string> = {
             heatmap: "Heatmap",
             routes: "Routes",
@@ -313,6 +319,7 @@ export function Dashboard({ athleteName }: Props) {
             times: "Run Times",
             records: "Records",
             stickers: "Stickers",
+            poster: "Poster",
           };
           return (
             <button
@@ -555,6 +562,36 @@ export function Dashboard({ athleteName }: Props) {
             </h2>
           </div>
           <StickerTab activities={filteredActivities} />
+        </div>
+      )}
+
+      {view === "poster" && (
+        <div
+          className="card-section"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "18px",
+            padding: "2rem",
+            marginBottom: "2rem",
+            overflow: "hidden",
+            animation: "slideUp 0.5s ease 0.25s both",
+          }}
+        >
+          <div
+            className="card-header"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+              Map Poster
+            </h2>
+          </div>
+          <PosterTab activities={filteredActivities} />
         </div>
       )}
 

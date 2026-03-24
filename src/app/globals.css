@@ -244,4 +244,10 @@ body::before {
     width: 100% !important;
     height: auto !important;
   }
+
+  .poster-preview-wrapper {
+    max-width: 100% !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
