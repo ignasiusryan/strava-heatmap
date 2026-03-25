@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   url.searchParams.set("client_id", clientId!);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("redirect_uri", redirectUri);
-  url.searchParams.set("approval_prompt", "auto");
+  url.searchParams.set("approval_prompt", "force");
   url.searchParams.set("scope", "read,activity:read_all,profile:read_all");
 
   return NextResponse.redirect(url.toString());
