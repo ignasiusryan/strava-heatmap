@@ -39,11 +39,13 @@ function InsightThumb({
   config,
   selected,
   onClick,
+  isClear,
 }: {
   template: InsightTemplate;
   config: InsightConfig;
   selected: boolean;
   onClick: () => void;
+  isClear: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -81,6 +83,7 @@ function InsightThumb({
           borderRadius: "8px",
           aspectRatio: "1",
           objectFit: "contain",
+          background: isClear ? "#1a1a1a" : undefined,
         }}
       />
       <span
@@ -102,9 +105,11 @@ function InsightThumb({
 function InsightPreview({
   template,
   config,
+  isClear,
 }: {
   template: InsightTemplate;
   config: InsightConfig;
+  isClear: boolean;
 }) {
   const previewRef = useRef<HTMLCanvasElement>(null);
   const downloadRef = useRef<HTMLCanvasElement>(null);
@@ -134,7 +139,9 @@ function InsightPreview({
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
       <div
         style={{
-          background: "repeating-conic-gradient(#1a1a1a 0% 25%, #222 0% 50%) 50% / 20px 20px",
+          background: isClear
+            ? "repeating-conic-gradient(#1a1a1a 0% 25%, #222 0% 50%) 50% / 20px 20px"
+            : "repeating-conic-gradient(#e0e0e0 0% 25%, #f0f0f0 0% 50%) 50% / 20px 20px",
           borderRadius: "16px",
           padding: "20px",
           display: "inline-block",
@@ -233,7 +240,7 @@ export function StickerTab({ activities, athleteName, shoes }: Props) {
       </div>
 
       {/* Preview */}
-      <InsightPreview template={currentTemplate} config={config} />
+      <InsightPreview template={currentTemplate} config={config} isClear={theme === "clear"} />
 
       {/* Template gallery */}
       <div>
@@ -253,6 +260,7 @@ export function StickerTab({ activities, athleteName, shoes }: Props) {
               config={config}
               selected={selectedTemplate === t.id}
               onClick={() => setSelectedTemplate(t.id)}
+              isClear={theme === "clear"}
             />
           ))}
         </div>
