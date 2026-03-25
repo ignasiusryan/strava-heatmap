@@ -64,11 +64,11 @@ function RouteThumb({ activity }: { activity: Activity }) {
 }
 
 function getLocation(activity: Activity): string | null {
-  // Try city first, then state, then extract from timezone
+  // Prefer reverse-geocoded city
+  if (activity.resolved_city) return activity.resolved_city;
   if (activity.location_city) return activity.location_city;
   if (activity.location_state) return activity.location_state;
   if (activity.timezone) {
-    // Timezone format: "(GMT+07:00) Asia/Jakarta" or "Asia/Jakarta"
     const match = activity.timezone.match(/\/([^)]+)$/);
     if (match) return match[1].replace(/_/g, " ");
   }

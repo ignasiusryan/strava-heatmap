@@ -27,7 +27,8 @@ export const temperatureRanger: InsightTemplate = {
     drawTextCentered(ctx, "Temperature Range", W / 2, 96, "700 26px 'Plus Jakarta Sans', sans-serif", c.text);
 
     if (withTemp.length === 0) {
-      drawTextCentered(ctx, "No temperature data available", W / 2, 280, "400 14px 'Plus Jakarta Sans', sans-serif", c.textMuted);
+      drawTextCentered(ctx, "No temperature data available", W / 2, 260, "400 14px 'Plus Jakarta Sans', sans-serif", c.textMuted);
+      drawTextCentered(ctx, "Your device may not record temperature", W / 2, 286, "400 11px 'JetBrains Mono', monospace", c.textDim);
       return;
     }
 

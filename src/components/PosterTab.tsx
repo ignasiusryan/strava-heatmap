@@ -15,9 +15,11 @@ interface Props {
 
 function getLocation(a: Activity): string {
   const parts: string[] = [];
-  if (a.location_city) parts.push(a.location_city);
+  if (a.resolved_city) parts.push(a.resolved_city);
+  else if (a.location_city) parts.push(a.location_city);
   else if (a.location_state) parts.push(a.location_state);
-  if (a.location_country) parts.push(a.location_country);
+  if (a.resolved_country) parts.push(a.resolved_country);
+  else if (a.location_country) parts.push(a.location_country);
   if (parts.length > 0) return parts.join(", ");
   if (a.timezone) {
     const match = a.timezone.match(/\/([^/]+)$/);

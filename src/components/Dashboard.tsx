@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { buildHeatmap, type HeatmapMode } from "@/lib/heatmap";
+import { geocodeActivities, getGeocodedLocation } from "@/lib/geocode";
 import { StatsRow } from "./StatsRow";
 import { Heatmap } from "./Heatmap";
 import { StackedHeatmap } from "./StackedHeatmap";
@@ -45,6 +46,9 @@ export interface Activity {
   average_temp?: number | null;
   gear_id?: string | null;
   total_elevation_gain?: number;
+  start_latlng?: [number, number] | null;
+  resolved_city?: string | null;
+  resolved_country?: string | null;
 }
 
 interface Props {
@@ -94,15 +98,31 @@ export function Dashboard({ athleteName }: Props) {
           }
           throw new Error("Failed to fetch activities");
         }
-        const data = await activitiesRes.json();
+        const data: Activity[] = await activitiesRes.json();
         setActivities(data);
 
         if (athleteRes.ok) {
           const athlete = await athleteRes.json();
+          console.log("[lariviz] athlete.shoes:", athlete.shoes);
           if (Array.isArray(athlete.shoes)) {
             setShoes(athlete.shoes);
           }
         }
+
+        // Reverse-geocode activities client-side using Nominatim
+        geocodeActivities(data).then(() => {
+          setActivities((prev) =>
+            prev.map((a) => {
+              const geo = getGeocodedLocation(a);
+              if (geo && (geo.city || geo.country)) {
+                return { ...a, resolved_city: geo.city, resolved_country: geo.country };
+              }
+              return a;
+            })
+          );
+        }).catch((e) => {
+          console.warn("[lariviz] geocode failed:", e);
+        });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Unknown error");
       } finally {

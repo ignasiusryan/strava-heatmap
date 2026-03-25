@@ -3,12 +3,22 @@ import { getColors, drawTextCentered, drawWatermark } from "./shared";
 
 const W = 540, H = 540;
 
-function getCity(a: { location_city?: string | null; location_state?: string | null }): string | null {
-  return a.location_city || a.location_state || null;
+function getCity(a: { location_city?: string | null; location_state?: string | null; resolved_city?: string | null; timezone?: string }): string | null {
+  if (a.resolved_city) return a.resolved_city;
+  if (a.location_city) return a.location_city;
+  if (a.location_state) return a.location_state;
+  // Last resort: extract from timezone
+  if (a.timezone) {
+    const match = a.timezone.match(/\/([^/]+)$/);
+    if (match) return match[1].replace(/_/g, " ");
+  }
+  return null;
 }
 
-function getCountry(a: { location_country?: string | null }): string {
-  return a.location_country || "";
+function getCountry(a: { location_country?: string | null; resolved_country?: string | null }): string {
+  if (a.resolved_country) return a.resolved_country;
+  if (a.location_country) return a.location_country;
+  return "";
 }
 
 export const cityStamps: InsightTemplate = {
