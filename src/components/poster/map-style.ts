@@ -1,7 +1,7 @@
 import type { PosterPalette } from "@/data/poster-palettes";
 import type { StyleSpecification } from "maplibre-gl";
 
-export function buildMapStyle(palette: PosterPalette): StyleSpecification {
+export function buildMapStyle(palette: PosterPalette, streetOpacity = 1): StyleSpecification {
   return {
     version: 8,
     sources: {
@@ -96,7 +96,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoadsMinor,
           "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.5, 14, 1],
-          "line-opacity": 0.3,
+          "line-opacity": 0.3 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },
@@ -111,7 +111,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoadsMinor,
           "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.4, 14, 1.2],
-          "line-opacity": 0.35,
+          "line-opacity": 0.35 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },
@@ -125,7 +125,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoadsMinor,
           "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.3, 12, 0.8, 14, 1.5],
-          "line-opacity": 0.4,
+          "line-opacity": 0.4 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },
@@ -139,7 +139,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoads,
           "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.5, 12, 1.2, 14, 2],
-          "line-opacity": 0.45,
+          "line-opacity": 0.45 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },
@@ -153,7 +153,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoads,
           "line-width": ["interpolate", ["linear"], ["zoom"], 7, 0.6, 12, 1.5, 14, 2.5],
-          "line-opacity": 0.5,
+          "line-opacity": 0.5 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },
@@ -167,7 +167,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoadsMajor,
           "line-width": ["interpolate", ["linear"], ["zoom"], 6, 0.8, 12, 2, 14, 3.5],
-          "line-opacity": 0.5,
+          "line-opacity": 0.5 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },
@@ -181,7 +181,7 @@ export function buildMapStyle(palette: PosterPalette): StyleSpecification {
         paint: {
           "line-color": palette.mapRoadsMajor,
           "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 12, 2.5, 14, 4],
-          "line-opacity": 0.5,
+          "line-opacity": 0.5 * streetOpacity,
         },
         layout: { "line-cap": "round", "line-join": "round" },
       },

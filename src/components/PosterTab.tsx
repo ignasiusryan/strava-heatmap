@@ -44,6 +44,7 @@ const PREVIEW_SCALE = 0.38; // preview at ~410px wide
 export function PosterTab({ activities, athleteName }: Props) {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [paletteId, setPaletteId] = useState("gold");
+  const [streetOpacity, setStreetOpacity] = useState(1);
   const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -267,6 +268,33 @@ export function PosterTab({ activities, athleteName }: Props) {
             <PalettePicker selected={paletteId} onSelect={setPaletteId} />
           </div>
 
+          {/* Street opacity slider */}
+          <div>
+            <label style={sectionLabel}>
+              Street visibility
+              <span style={{ fontWeight: 400, marginLeft: "0.5rem", opacity: 0.6 }}>
+                {Math.round(streetOpacity * 100)}%
+              </span>
+            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span style={{ fontSize: "0.65rem", fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>0%</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round(streetOpacity * 100)}
+                onChange={(e) => setStreetOpacity(Number(e.target.value) / 100)}
+                style={{
+                  flex: 1,
+                  accentColor: "var(--orange-5)",
+                  height: "4px",
+                  cursor: "pointer",
+                }}
+              />
+              <span style={{ fontSize: "0.65rem", fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>100%</span>
+            </div>
+          </div>
+
           {/* Poster preview */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
             <div
@@ -307,6 +335,7 @@ export function PosterTab({ activities, athleteName }: Props) {
                   <PosterMap
                     polyline={selectedActivity.map.summary_polyline}
                     palette={palette}
+                    streetOpacity={streetOpacity}
                     width={POSTER_W - 50}
                     height={Math.round(POSTER_H * 0.75)}
                     onMapReady={handleMapReady}

@@ -12,10 +12,11 @@ interface Props {
   palette: PosterPalette;
   width: number;
   height: number;
+  streetOpacity?: number;
   onMapReady?: (map: maplibregl.Map) => void;
 }
 
-export function PosterMap({ polyline, palette, width, height, onMapReady }: Props) {
+export function PosterMap({ polyline, palette, width, height, streetOpacity = 1, onMapReady }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
 
@@ -160,13 +161,13 @@ export function PosterMap({ polyline, palette, width, height, onMapReady }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [polyline]); // Only re-create map when polyline changes
 
-  // Update palette without recreating map
+  // Update palette and street opacity without recreating map
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
 
-    // Update base style layers
-    const newStyle = buildMapStyle(palette);
+    // Update base style layers (including road opacities)
+    const newStyle = buildMapStyle(palette, streetOpacity);
     for (const layer of newStyle.layers) {
       if ("paint" in layer && layer.paint) {
         try {
@@ -181,7 +182,7 @@ export function PosterMap({ polyline, palette, width, height, onMapReady }: Prop
 
     // Update route colors
     updateStyle(map);
-  }, [palette, updateStyle]);
+  }, [palette, streetOpacity, updateStyle]);
 
   return (
     <div
