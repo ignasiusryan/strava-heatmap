@@ -41,14 +41,27 @@ export interface Activity {
   location_state?: string | null;
   location_country?: string | null;
   timezone?: string;
+  average_speed?: number;
+  average_temp?: number | null;
+  gear_id?: string | null;
+  total_elevation_gain?: number;
 }
 
 interface Props {
   athleteName: string;
 }
 
+interface ShoeData {
+  id: string;
+  name: string;
+  distance: number;
+  primary: boolean;
+  retired: boolean;
+}
+
 export function Dashboard({ athleteName }: Props) {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [shoes, setShoes] = useState<ShoeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<HeatmapMode>({ type: "rolling" });
@@ -70,16 +83,26 @@ export function Dashboard({ athleteName }: Props) {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/strava/activities");
-        if (!res.ok) {
-          if (res.status === 401) {
+        const [activitiesRes, athleteRes] = await Promise.all([
+          fetch("/api/strava/activities"),
+          fetch("/api/strava/athlete"),
+        ]);
+        if (!activitiesRes.ok) {
+          if (activitiesRes.status === 401) {
             window.location.href = "/api/auth/logout";
             return;
           }
           throw new Error("Failed to fetch activities");
         }
-        const data = await res.json();
+        const data = await activitiesRes.json();
         setActivities(data);
+
+        if (athleteRes.ok) {
+          const athlete = await athleteRes.json();
+          if (Array.isArray(athlete.shoes)) {
+            setShoes(athlete.shoes);
+          }
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Unknown error");
       } finally {
@@ -561,7 +584,7 @@ export function Dashboard({ athleteName }: Props) {
               Create Sticker
             </h2>
           </div>
-          <StickerTab activities={filteredActivities} />
+          <StickerTab activities={filteredActivities} athleteName={athleteName} shoes={shoes} />
         </div>
       )}
 
