@@ -15,6 +15,8 @@ export function DashboardHeader({ athleteName }: Props) {
         alignItems: "flex-end",
         justifyContent: "space-between",
         marginBottom: "1.5rem",
+        padding: "0 2rem",
+        maxWidth: "1100px",
         flexWrap: "wrap",
         gap: "1rem",
       }}
